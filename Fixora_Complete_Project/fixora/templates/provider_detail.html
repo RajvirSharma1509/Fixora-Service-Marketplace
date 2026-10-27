@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ provider.business_name }}{% endblock %}
+{% block content %}
+<h1>{{ provider.business_name }}</h1>
+<p class="muted">{{ provider.service_area }} · {{ provider.experience_years }} year(s) experience</p>
+<p>
+  <span class="badge {% if provider.is_approved %}ok{% endif %}">{{ provider.get_verification_status_display }}</span>
+  {% if provider.is_demo %}<span class="badge">Demo data, not a real business</span>{% endif %}
+</p>
+<p>{{ provider.bio|linebreaksbr }}</p>
+
+<h2>Services</h2>
+<div class="grid">
+  {% for s in services %}
+    <article class="card">
+      <h3>{{ s.title }}</h3>
+      <p>{{ s.description }}</p>
+      <p>Starting from <strong>₹{{ s.starting_price }}</strong> {{ s.get_pricing_method_display }}</p>
+      {% if provider.is_approved %}
+        <a class="btn btn-small" href="{% url 'book_service' s.pk %}">Book this service</a>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p class="empty">No active services listed.</p>
+  {% endfor %}
+</div>
+{% endblock %}

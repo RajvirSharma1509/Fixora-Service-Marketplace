@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1>Create your Fixora account</h1>
+  <p class="muted">Choose how you want to use Fixora. Customers can book local services; providers can offer services after admin approval.</p>
+  <form method="post" class="form" id="register-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="field">
+      <label for="{{ form.username.id_for_label }}">Username</label>{{ form.username }}{% for e in form.username.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="field">
+      <label for="{{ form.email.id_for_label }}">Email address</label>{{ form.email }}{% for e in form.email.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="field">
+      <label for="{{ form.password1.id_for_label }}">Password</label>{{ form.password1 }}{% for e in form.password1.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="field">
+      <label for="{{ form.password2.id_for_label }}">Confirm password</label>{{ form.password2 }}{% for e in form.password2.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="field role-choice">
+      <label for="{{ form.is_provider.id_for_label }}">Account type</label>
+      <div class="role-option"><label><input type="radio" name="account_type" value="customer" checked> I want to book services (Customer)</label></div>
+      <div class="role-option"><label><input type="radio" name="account_type" value="provider"> I want to offer services (Provider)</label></div>
+      <input type="checkbox" name="is_provider" id="id_is_provider" hidden>
+    </div>
+    <div id="provider-fields" hidden>
+      <div class="field"><label for="{{ form.business_name.id_for_label }}">Business name</label>{{ form.business_name }}{% for e in form.business_name.errors %}<p class="error">{{ e }}</p>{% endfor %}</div>
+      <div class="field"><label for="{{ form.service_area.id_for_label }}">Service area / city</label>{{ form.service_area }}{% for e in form.service_area.errors %}<p class="error">{{ e }}</p>{% endfor %}</div>
+      <p class="muted">Provider accounts need admin approval before their listings appear to customers.</p>
+    </div>
+    {% for field in form %}{% if field.name != 'username' and field.name != 'email' and field.name != 'password1' and field.name != 'password2' and field.name != 'is_provider' and field.name != 'business_name' and field.name != 'service_area' %}<div class="field"><label>{{ field.label }}</label>{{ field }}</div>{% endif %}{% endfor %}
+    <button class="btn" type="submit">Create account</button>
+  </form>
+  <p>Already registered? <a href="{% url 'login' %}">Log in</a></p>
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const radios = document.querySelectorAll('input[name="account_type"]');
+  const providerCheckbox = document.getElementById('id_is_provider');
+  const providerFields = document.getElementById('provider-fields');
+  const business = document.getElementById('id_business_name');
+  const area = document.getElementById('id_service_area');
+  function updateRole() {
+    const isProvider = document.querySelector('input[name="account_type"]:checked').value === 'provider';
+    providerCheckbox.checked = isProvider;
+    providerFields.hidden = !isProvider;
+    business.required = isProvider;
+    area.required = isProvider;
+  }
+  radios.forEach(r => r.addEventListener('change', updateRole));
+  updateRole();
+});
+</script>
+{% endblock %}

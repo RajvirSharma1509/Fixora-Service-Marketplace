@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Browse services{% endblock %}
+{% block content %}
+<h1>Browse services</h1>
+<form method="get" class="filters">
+  <input type="search" name="q" value="{{ q }}" placeholder="Keyword" aria-label="Keyword">
+  <select name="category" aria-label="Category">
+    <option value="">All categories</option>
+    {% for c in categories %}
+      <option value="{{ c.pk }}" {% if c.pk|stringformat:"s" == selected_category %}selected{% endif %}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="area" value="{{ area }}" placeholder="Service area" aria-label="Service area">
+  <input type="number" name="max_price" value="{{ max_price }}" min="0" step="50" placeholder="Max starting price (₹)" aria-label="Maximum starting price">
+  <select name="sort" aria-label="Sort">
+    <option value="">Sort: name</option>
+    <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Price: low to high</option>
+    <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Price: high to low</option>
+  </select>
+  <button class="btn" type="submit">Apply</button>
+</form>
+
+<p class="muted">{{ page_obj.paginator.count }} result(s)</p>
+<div class="grid">
+  {% for s in page_obj %}
+    <article class="card">
+      <h3>{{ s.title }}</h3>
+      <p class="muted">{{ s.category.name }} · {{ s.provider.business_name }} · {{ s.provider.service_area }}</p>
+      <p>Starting from <strong>₹{{ s.starting_price }}</strong> {{ s.get_pricing_method_display }}</p>
+      <a class="btn btn-small" href="{% url 'book_service' s.pk %}">Book</a>
+      <a href="{% url 'provider_detail' s.provider.pk %}">View provider</a>
+    </article>
+  {% empty %}
+    <div class="empty">
+      <p>No services match these filters.</p>
+      <a href="{% url 'search' %}">Clear filters</a>
+    </div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav class="pager">
+  {% if page_obj.has_previous %}<a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?{{ query_string }}&page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Find Trusted Services Near You.</h1>
+  <p>Compare local service providers, check starting prices, and send a booking request.</p>
+  <form action="{% url 'search' %}" method="get" class="search-form">
+    <input type="search" name="q" placeholder="e.g. plumber, AC repair" aria-label="Search services">
+    <button class="btn" type="submit">Search</button>
+  </form>
+</section>
+
+<h2>Categories</h2>
+<div class="grid">
+  {% for c in categories %}
+    <a class="card" href="{% url 'search' %}?category={{ c.pk }}"><h3>{{ c.name }}</h3></a>
+  {% empty %}
+    <p class="empty">No categories yet. Run <code>python manage.py seed_demo</code>.</p>
+  {% endfor %}
+</div>
+
+<h2>Approved providers</h2>
+<div class="grid">
+  {% for p in featured %}
+    <a class="card" href="{% url 'provider_detail' p.pk %}">
+      <h3>{{ p.business_name }}</h3>
+      <p class="muted">{{ p.service_area }}</p>
+      {% if p.is_demo %}<span class="badge">Demo data</span>{% endif %}
+      <span class="badge ok">Approved</span>
+    </a>
+  {% empty %}
+    <p class="empty">No approved providers yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

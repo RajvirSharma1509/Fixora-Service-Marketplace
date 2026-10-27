@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Book {{ service.title }}{% endblock %}
+{% block content %}
+<h1>Book: {{ service.title }}</h1>
+<p>Provider: <a href="{% url 'provider_detail' service.provider.pk %}">{{ service.provider.business_name }}</a></p>
+<p class="notice">
+  <strong>Starting price: ₹{{ service.starting_price }}</strong> ({{ service.get_pricing_method_display }}).
+  This is an estimate only. The provider confirms the final quote.
+</p>
+<form method="post" class="form">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for field in form %}
+    <div class="field">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% for e in field.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    </div>
+  {% endfor %}
+  <button class="btn" type="submit">Send booking request</button>
+</form>
+{% endblock %}

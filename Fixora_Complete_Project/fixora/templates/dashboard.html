@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+{% if provider %}
+  <h1>Provider dashboard: {{ provider.business_name }}</h1>
+  <p>Verification: <span class="badge {% if provider.is_approved %}ok{% endif %}">{{ provider.get_verification_status_display }}</span></p>
+  {% if not provider.is_approved %}
+    <p class="notice">Your account must be approved by the Fixora admin before you can receive or manage bookings.</p>
+  {% endif %}
+  <h2>Booking requests and jobs</h2>
+  <table class="table">
+    <thead><tr><th>#</th><th>Service</th><th>Customer</th><th>When</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for b in bookings %}
+        <tr>
+          <td><a href="{% url 'booking_detail' b.pk %}">{{ b.pk }}</a></td>
+          <td>{{ b.service.title }}</td>
+          <td>{{ b.customer.username }}</td>
+          <td>{{ b.scheduled_at|date:"d M Y, H:i" }}</td>
+          <td>{{ b.get_status_display }}</td>
+          <td class="actions">
+            {% if b.status == "pending" %}
+              <form method="post" action="{% url 'provider_update_booking' b.pk 'accept' %}">{% csrf_token %}<button class="btn btn-small" type="submit">Accept</button></form>
+              <form method="post" action="{% url 'provider_update_booking' b.pk 'reject' %}" data-confirm="Reject this booking request?">{% csrf_token %}<button class="btn btn-small btn-danger" type="submit">Reject</button></form>
+            {% elif b.status == "accepted" %}
+              <form method="post" action="{% url 'provider_update_booking' b.pk 'start' %}">{% csrf_token %}<button class="btn btn-small" type="submit">Start work</button></form>
+            {% elif b.status == "in_progress" %}
+              <form method="post" action="{% url 'provider_update_booking' b.pk 'complete' %}">{% csrf_token %}<button class="btn btn-small" type="submit">Mark completed</button></form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No booking requests yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <h1>Your bookings</h1>
+  <table class="table">
+    <thead><tr><th>#</th><th>Service</th><th>Provider</th><th>When</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for b in bookings %}
+        <tr>
+          <td><a href="{% url 'booking_detail' b.pk %}">{{ b.pk }}</a></td>
+          <td>{{ b.service.title }}</td>
+          <td>{{ b.provider.business_name }}</td>
+          <td>{{ b.scheduled_at|date:"d M Y, H:i" }}</td>
+          <td>{{ b.get_status_display }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">You have no bookings yet. <a href="{% url 'search' %}">Browse services</a>.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

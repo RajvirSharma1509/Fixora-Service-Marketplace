@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Booking #{{ booking.pk }}{% endblock %}
+{% block content %}
+<h1>Booking #{{ booking.pk }}</h1>
+<p>Status: <span class="badge">{{ booking.get_status_display }}</span></p>
+<dl class="details">
+  <dt>Service</dt><dd>{{ booking.service.title }}</dd>
+  <dt>Provider</dt><dd>{{ booking.provider.business_name }}</dd>
+  <dt>Customer</dt><dd>{{ booking.customer.username }}</dd>
+  <dt>Date and time</dt><dd>{{ booking.scheduled_at|date:"d M Y, H:i" }}</dd>
+  <dt>Address</dt><dd>{{ booking.address|linebreaksbr }}</dd>
+  <dt>Problem</dt><dd>{{ booking.problem|linebreaksbr }}</dd>
+  <dt>Starting price (estimate, not final quote)</dt><dd>₹{{ booking.quoted_price }}</dd>
+</dl>
+{% if can_cancel %}
+  <form method="post" action="{% url 'cancel_booking' booking.pk %}" data-confirm="Cancel this booking?">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Cancel booking</button>
+  </form>
+{% endif %}
+{% endblock %}
