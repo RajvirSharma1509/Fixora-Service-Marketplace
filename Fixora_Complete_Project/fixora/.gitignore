@@ -6,3 +6,36 @@ db.sqlite3
 .env
 *.log
 .DS_Store
+
+# Django collected static files
+Fixora_Complete_Project/fixora/staticfiles/
+
+# Environment and secret files
+.env
+.env.*
+!.env.example
+
+# Local database
+db.sqlite3
+
+# Deployment-generated files
+staticfiles/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Local database
+db.sqlite3
+
+# Deployment-generated files
+staticfiles/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Local database
+db.sqlite3
